@@ -1,0 +1,125 @@
+
+/* 1. Use PropTypes for components using props.
+ It makes sure you get the right type of data, and makes things much easier to debug. It also makes things easier when working in a team.
+*/
+import PropTypes from 'prop-types'
+
+function Badge(props) {
+    return (
+        <div>
+            <img
+                src={props.img}
+                alt="Avatar"
+                style={{ width: 100, height: 100 }}
+            />
+            <h1>Name: {props.name}</h1>
+            <h3>username: {props.username}</h3>
+        </div>
+    )
+}
+
+Badge.propTypes = {
+    img: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    username: PropTypes.string.isRequired,
+}
+
+/* 2. Pure function
+    - Doesn't depend on variables outside its scope
+    - Doesn't modify variables outside its scope
+    - Doesn't make Ajax requests
+    - Doesn't manipulate the DOM
+*/
+
+// 3. Dynamically setting up styles
+<li style={lang === this.state.selectedLanguage ? { color: '#d0021b' } : null}> {lang} </li>
+           
+
+// 4. Passing a function to a child component
+// Parent:
+<SelectLanguage selectedLanguage={this.state.selectedLanguage} click={this.updateLanguage} />
+// Child:
+<li onClick={() => props.click(lang)}{lang}></li>
+
+// 5. First deal with synchronous code, and then async
+updateLanguage = async (lang) => {
+    // First we handle the synchronous code
+    this.setState({ selectedLanguage: lang, repos: null })
+
+    // And then the async, to avoid slow reaction for 'active' UI
+    const repos = await fetchPopularRepos(lang)
+    this.setState({repos})
+}
+
+// 6. React router
+npm install --save react-router-dom
+
+// Importing
+import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+
+/* Here we're creating a route /popular and rendering Popular for that route. */
+class App extends Component {
+	render() {
+		return (
+			<Router>
+				<div className="App">
+					<Route path='/popular' component={Popular} />
+				</div>
+			</Router>
+		)
+	}
+}
+
+// Navigation
+
+import { NavLink } from "react-router-dom";
+
+<ul className='nav'>
+    <li><NavLink exact activeClassName='active' to='/'>Home</NavLink></li>
+    <li><NavLink activeClassName='active' to='/battle'>Battle</NavLink></li>
+    <li><NavLink activeClassName='active' to='/popular'>Popular</NavLink></li>
+</ul>
+
+// Links
+
+import { Link } from "react-router-dom";
+<Link className='button' to='/battle'>Battle</Link>
+
+// Rendering routes while nav is also visible
+
+class App extends Component {
+	render() {
+		return (
+			<Router>
+				<div className="container">
+				<Nav />
+					<Route path='/popular' component={Popular} />
+					<Route exact path='/' component={Home} />
+				</div>
+			</Router>
+		)
+	}
+}
+
+// Switch - adding a 404 page text. But you can also dedicate a component for it.
+// It basically goes through all the routes, and if it doesn't find, it'll render the last Route.
+
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+
+class App extends Component {
+	render() {
+		return (
+			<Router>
+				<div className="container">
+					<Nav />
+					<Switch>
+						<Route exact path='/' component={Home} />
+						<Route exact path='/battle' component={Battle} />
+						<Route path='/popular' component={Popular} />
+                        <Route render={() => <p>Not found!</p>} />
+					</Switch>
+				</div>
+			</Router>
+		)
+	}
+}
