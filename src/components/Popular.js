@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { fetchPopularRepos } from '../utils/api'
+import Loading from './Loading'
 
 function RepoGrid(props) {
     const repos = props.repos
@@ -33,7 +34,7 @@ function SelectLanguage(props) {
         <ul className='languages'>
             {languages.map(lang => (
                 <li
-                    // Dynamically setting up styles.
+                    // 3.
                     style={lang === props.selectedLanguage ? { color: '#d0021b' } : null}
                     onClick={() => props.click(lang)}
                     key={lang}>
@@ -50,34 +51,39 @@ SelectLanguage.propTypes = {
 }
 
 class Popular extends Component {
-    constructor(props) {
-        super(props)
-        this.state = {
-            selectedLanguage: 'All',
-            repos: null
-        }
+    _isMounted = false
+
+    state = {
+        selectedLanguage: 'All',
+        repos: null
     }
+
     componentDidMount() {
+        this._isMounted = true
         this.updateLanguage(this.state.selectedLanguage)
     }
-    /* First we handle the synchronous code
-    And then the async, to avoid slow reaction for 'active' UI*/
+
+    componentWillUnmount() {
+        this._isMounted = false
+    }
+
+    // 5.
     updateLanguage = async (lang) => {
         this.setState({ selectedLanguage: lang, repos: null })
-
         const repos = await fetchPopularRepos(lang)
-        this.setState({ repos })
+        if (this._isMounted) {
+            this.setState({ repos })
+        }
     }
+    
     render() {
-        /* Passing a function to a child component as a prop (click), 
-        and then in the child component, we use it for onClick,
-        passing the argument.*/
+        // 4.
         return (
             <>
                 <SelectLanguage selectedLanguage={this.state.selectedLanguage} click={this.updateLanguage} />
                 {this.state.repos !== null
                     ? <RepoGrid repos={this.state.repos} />
-                    : <p>Loading</p>}
+                    : <Loading />}
 
             </>
         )

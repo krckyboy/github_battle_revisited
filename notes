@@ -36,6 +36,9 @@ Badge.propTypes = {
            
 
 // 4. Passing a function to a child component
+        /* Passing a function to a child component as a prop (click), 
+        and then in the child component, we use it for onClick,
+        passing the argument.*/
 // Parent:
 <SelectLanguage selectedLanguage={this.state.selectedLanguage} click={this.updateLanguage} />
 // Child:
@@ -123,3 +126,162 @@ class App extends Component {
 		)
 	}
 }
+
+// 7. Controlled components (forms)
+
+// 8. Passing func to a child component
+    /* 
+    We'll be passing this function to a child component as a prop, and then, once we call the function in the child component, it will send back the ID and username to the parent component.
+    */
+    handleSubmit = (id, username) => {
+        this.setState(() => {
+            const newState = {}
+            newState[id + 'Name'] = username
+            newState[id + 'Image'] = `https://github.com/${username}.png?size=200`
+            return newState
+        })
+    }
+
+// 9. Using && as shorthand if statement
+
+/*
+    If !playerOneName is truthy, return <PlayerInput />
+ */
+
+    render() {
+        const playerOneName = this.state.playerOneName
+        const playerTwoName = this.state.playerTwoName
+        return (
+            <div>
+                <div className="row">
+                    {!playerOneName &&
+                        <PlayerInput />} 
+
+                    {!playerTwoName &&
+                        <PlayerInput />} 
+                </div>
+            </div>
+        )
+    }
+
+// 10. Disable a button if state is falsey
+
+    <button
+        className='button'
+        type='submit'
+        disabled={!this.state.username}>
+        Submit
+    </button>
+
+// 11. Dynamic routes!
+/*
+    First you import Link, which will lead to that route. 
+    React also passes some info through props, such as the current URL (through this.props.match)
+
+*/
+    import { Link } from 'react-router-dom'
+    const { match } = this.props
+
+    <Link
+        className='button'
+        to={{
+            pathname: `${match.url}/results`,
+            search: `?playerOneName=${playerOneName}&playerTwoName=${playerTwoName}`
+        }}>
+        Battle
+    </Link>
+
+/*
+    You then also make a route in the App.js, leading to let's say /battle/results, passing the component that you want it to render.
+    In that new component, you can parse properties from URL with an npm package which will treat it as an object (makes things easier)
+    You parse it from this.props.location.search (if search is the property)
+*/
+    npm install --save query-string
+
+    <Route path='/battle/results' component={Results} />
+
+/* 
+    console.log(this.props.location.search) // ?playerOneName=asd&playerTwoName=dsa
+*/
+
+import queryString from 'query-string'
+const players = queryString.parse(this.props.location.search) // {playerOneName: 'krckyboy', playerTwoName: 'tylermcginnis'}
+
+
+// 12. Props.children
+
+    class PlayerPreview extends Component {
+        static propTypes = {
+            avatar: PropTypes.string.isRequired,
+            username: PropTypes.string.isRequired,
+        }
+        render() {
+            return (
+                <div>
+                    <div className="column">
+                        <img className='avatar' src={this.props.avatar} alt={`Avatar for ${this.props.username}`} />
+                        <h2 className='username'>@{this.props.username}</h2>
+                    </div>
+                    /* Here you pass the children. */
+                    {this.props.children}
+                </div>
+            )
+        }
+    }
+
+    /* 
+        When you want to use it:
+    */
+
+    <PlayerPreview avatar={playerTwoImage} username={playerTwoName} >
+        <button className='reset' onClick={() => this.handleReset('playerTwo')}>Reset</button>
+    </PlayerPreview>
+
+// 13. Default props
+
+    class Loading extends Component {
+        state = {
+            text: this.props.text
+        }
+
+        static defaultProps = {
+            text: 'Loading'
+        }
+
+        render() {
+            return (
+                <p style={styles.content}>
+                    {this.state.text}
+                </p>
+            )
+        }
+    }
+
+    /* 
+        And then, you can pass in the custom text if you want
+    */
+
+    <Loading text='loading yo' />
+
+// 14. Getting rid of error --- isMounted. Basically, you get an error if you try to setState to an unmounted component, so there's a workaround for that:
+
+// Inside a component...
+
+    _isMounted = false
+
+    componentDidMount() {
+        this._isMounted = true
+        this.updateLanguage(this.state.selectedLanguage)
+    }
+
+    componentWillUnmount() {
+        this._isMounted = false
+    }
+
+    updateLanguage = async (lang) => {
+        this.setState({ selectedLanguage: lang, repos: null })
+        const repos = await fetchPopularRepos(lang)
+        if (this._isMounted) {
+            this.setState({ repos })
+        }
+    }
